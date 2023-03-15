@@ -1,6 +1,7 @@
 #include "stm32l476xx.h"
 #include "SysTick.h"
 #include "LED.h"
+#include "LCD.h"
 
 void System_Clock_Init(void){
 	
@@ -13,7 +14,7 @@ void System_Clock_Init(void){
 	while ((RCC->CR & RCC_CR_MSIRDY) == 0); 	
 	
 	// MSIRANGE can be modified when MSI is OFF (MSION=0) or when MSI is ready (MSIRDY=1). 
-	RCC->CR &= ~RCC_CR_MSIRANGE; 
+	RCC->CR &= ~RCC_CR_MSIRANGE;
 	RCC->CR |= RCC_CR_MSIRANGE_7;  // Select MSI 8 MHz	
  
 	// The MSIRGSEL bit in RCC-CR select which MSIRANGE is used. 
@@ -27,10 +28,27 @@ void System_Clock_Init(void){
 
 
 int main(void){
+	uint8_t stopwatch[] = "00:00.00";
+	//int minutes, seconds, ms;
 	//System Clock Initialization
+	System_Clock_Init();
 	//LED Initialization
+	LED_Init();
+	//LCD Initialization
+	LCD_Initialization();
 	//SysTick Initialization
-	//delay of 1Sec
-	//LED Toggle
-
+	SysTick_Init(1000);
+	
+	while(1) {
+		//delay of 1Sec
+		//delay(1000);
+		// Delay of 1ms
+		//delay(1);
+		
+		//LED Toggle
+		//Red_LED_Toggle();
+		LCD_DisplayString(stopwatch);
+		SysTick_Write_Time((char *)stopwatch);
+		
 	}
+}
