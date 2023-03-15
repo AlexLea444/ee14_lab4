@@ -26,7 +26,6 @@ void System_Clock_Init(void){
 	while ((RCC->CR & RCC_CR_MSIRDY) == 0); 		
 }
 
-
 int main(void){
 	uint8_t stopwatch[] = "00:00.00";
 	//int minutes, seconds, ms;

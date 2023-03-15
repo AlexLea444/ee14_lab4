@@ -1,5 +1,6 @@
 #include "stm32l476xx.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 volatile uint32_t TimeDelay;
 volatile uint32_t MillisecondsElapsed = 0;
@@ -41,9 +42,50 @@ void SysTick_Init(uint32_t ticks) {
 }
 
 // SysTick interrupt service routine
-void SysTick_Handler(void) {
+void SysTick_Handler(bool pause) {
 	TimeDelay--;
-	MillisecondsElapsed++;
+	if (pause == false) {
+		MillisecondsElapsed++;
+	}
+}
+
+void Joy_Init(void){
+	/* Enable GPIOs clock */ 	
+	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN | RCC_AHB2ENR_GPIOEEN;
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// LD4 Red = PB2
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// GPIO Mode: Input(00), Output(01), AlterFunc(10), Analog(11, reset)
+	GPIOB->MODER &= ~(3U<<(2*2));  
+	GPIOB->MODER |= 1U<<(2*2);      //  Output(01)
+	
+	// GPIO Speed: Low speed (00), Medium speed (01), Fast speed (10), High speed (11)
+	GPIOB->OSPEEDR &= ~(3U<<(2*2));
+	GPIOB->OSPEEDR |=   3U<<(2*2);  // High speed
+	
+	// GPIO Output Type: Output push-pull (0, reset), Output open drain (1) 
+	GPIOB->OTYPER &= ~(1U<<2);       // Push-pull
+	
+	// GPIO Push-Pull: No pull-up, pull-down (00), Pull-up (01), Pull-down (10), Reserved (11)
+	GPIOB->PUPDR   &= ~(3U<<(2*2));  // No pull-up, no pull-down
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// LD5 Green = PE8
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// GPIO Mode: Input(00, reset), Output(01), AlterFunc(10), Analog(11, reset)
+	GPIOE->MODER &= ~(3U<<(2*8));  
+	GPIOE->MODER |= 1U<<(2*8);      //  Output(01)
+	
+	// GPIO Speed: Low speed (00), Medium speed (01), Fast speed (10), High speed (11)
+	GPIOE->OSPEEDR &= ~(3U<<(2*8));
+	GPIOE->OSPEEDR |=   3U<<(2*8);  // High speed
+	
+	// GPIO Output Type: Output push-pull (0, reset), Output open drain (1) 
+	GPIOE->OTYPER &= ~(1U<<8);       // Push-pull
+	
+	// GPIO Push-Pull: No pull-up, pull-down (00), Pull-up (01), Pull-down (10), Reserved (11)
+	GPIOE->PUPDR   &= ~(3U<<(2*8));  // No pull-up, no pull-down
 }
 
 void SysTick_Print_Time(char *str, uint32_t time_to_format, int offset) {
@@ -63,31 +105,6 @@ void SysTick_Write_Time(char *str) {
 	MinutesElapsed = (MillisecondsElapsed % 3600000) / 60000;
 	SecondsElapsed = (MillisecondsElapsed % 60000) / 1000;
 	MillisecondsToDisplay = (MillisecondsElapsed % 1000) / 10;
-	
-	/*if (MinutesElapsed > 10) {
-		sprintf(str, "%d:", MinutesElapsed);
-	} else if (MinutesElapsed > 0) {
-		sprintf(str, "0%d:", MinutesElapsed);
-	} else {
-		sprintf(str, "00:");
-	}
-	
-	if (SecondsElapsed > 10) {
-		sprintf(str + 3, "%d:", SecondsElapsed);
-	} else if (SecondsElapsed > 0) {
-		sprintf(str + 3, "0%d:", SecondsElapsed);
-	} else {
-		sprintf(str + 3, "00.");
-	}	
-	
-	
-	if (MillisecondsToDisplay > 10) {
-		sprintf(str + 6, "%d", MillisecondsToDisplay);
-	} else if (MillisecondsToDisplay > 0) {
-		sprintf(str + 6, "0%d", MillisecondsToDisplay);
-	} else {
-		sprintf(str + 6, "00");
-	}*/
 	
 	SysTick_Print_Time(str, MinutesElapsed, 0);
 	sprintf(str + 2, ":");
