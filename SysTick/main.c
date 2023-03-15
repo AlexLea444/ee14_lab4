@@ -34,7 +34,9 @@ int main(void){
 	//LED Initialization
 	LED_Init();
 	//LCD Initialization
-	LCD_Initialization();
+	LCD_Init();
+	//Joystick Initialization
+	Joy_Init();
 	//SysTick Initialization
 	SysTick_Init(1000);
 	
@@ -46,6 +48,7 @@ int main(void){
 		
 		//LED Toggle
 		//Red_LED_Toggle();
+		Joy_Check();
 		LCD_DisplayString(stopwatch);
 		SysTick_Write_Time((char *)stopwatch);
 		

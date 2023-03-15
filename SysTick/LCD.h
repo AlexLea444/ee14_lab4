@@ -5,7 +5,7 @@
 
 #define bool _Bool
 
-void LCD_Initialization(void);
+void LCD_Init(void);
 void LCD_bar(void);
 void LCD_Clock_Init(void);
 void LCD_PIN_Init(void);
